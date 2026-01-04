@@ -1,0 +1,30 @@
+[file name]: .htaccess
+[file content begin]
+RewriteEngine On
+
+# Разрешаем все методы HTTP
+RewriteCond %{REQUEST_METHOD} !^(GET|POST|PUT|DELETE|OPTIONS)$
+RewriteRule .* - [R=405,L]
+
+# Для PHP файлов
+<Files "*.php">
+    # Разрешаем все методы
+    SetEnvIf Request_Method ".*" ALLOW_METHOD=$0
+    Allow from env=ALLOW_METHOD
+</Files>
+
+# Перенаправление API запросов
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^api/(.*)$ api/$1.php [L,QSA]
+
+# Разрешаем CORS
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+Header set Access-Control-Allow-Credentials "true"
+
+# Для OPTIONS запросов (preflight)
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+[file content end]

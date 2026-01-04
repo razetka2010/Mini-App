@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Менеджер паролей Telegram</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="container">
+    <!-- Загрузчик -->
+    <div id="loader" class="loader">
+        <div class="spinner"></div>
+        <p>Загрузка менеджера паролей...</p>
+    </div>
+
+    <!-- Главный интерфейс -->
+    <div id="app" class="hidden">
+        <!-- Шапка -->
+        <header>
+            <h1><i class="fas fa-lock"></i> Менеджер паролей</h1>
+            <div class="user-info">
+                <img id="user-photo" src="" alt="Фото">
+                <span id="user-name"></span>
+            </div>
+        </header>
+
+        <!-- Форма добавления пароля -->
+        <div class="card add-password-form">
+            <h2><i class="fas fa-plus"></i> Добавить пароль</h2>
+            <div class="form-group">
+                <input type="text" id="service-name" placeholder="Сервис (Google, Facebook...)" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <input type="text" id="login" placeholder="Логин/Email" autocomplete="off">
+            </div>
+            <div class="form-group password-group">
+                <input type="password" id="password" placeholder="Пароль" autocomplete="new-password">
+                <button type="button" class="toggle-password" id="toggle-password">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" onclick="addPassword()">
+                    <i class="fas fa-save"></i> Сохранить
+                </button>
+                <button class="btn btn-secondary" onclick="generatePassword()">
+                    <i class="fas fa-key"></i> Сгенерировать
+                </button>
+            </div>
+        </div>
+
+        <!-- Список паролей -->
+        <div class="card">
+            <h2><i class="fas fa-list"></i> Мои пароли</h2>
+            <div class="search-box">
+                <input type="text" id="search" placeholder="Поиск по сервису..." oninput="filterPasswords()">
+                <i class="fas fa-search"></i>
+            </div>
+            <div id="passwords-list" class="passwords-list">
+                <!-- Пароли будут здесь -->
+            </div>
+        </div>
+
+        <!-- Статистика -->
+        <div class="card stats">
+            <h2><i class="fas fa-chart-bar"></i> Статистика</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="total-passwords">0</div>
+                    <div class="stat-label">Всего паролей</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="last-added">-</div>
+                    <div class="stat-label">Последнее добавление</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для просмотра и редактирования пароля -->
+<div id="password-modal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-service"></h3>
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-field">
+                <label><i class="fas fa-user"></i> Логин:</label>
+                <input type="text" id="modal-login" readonly>
+                <button class="copy-btn" onclick="copyToClipboard('modal-login')">
+                    <i class="far fa-copy"></i>
+                </button>
+            </div>
+            <div class="modal-field">
+                <label><i class="fas fa-key"></i> Пароль:</label>
+                <input type="password" id="modal-password" readonly>
+                <button class="toggle-password" onclick="toggleModalPassword()">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="copy-btn" onclick="copyToClipboard('modal-password')">
+                    <i class="far fa-copy"></i>
+                </button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-actions">
+                <!-- Кнопки для режима просмотра -->
+                <button id="modal-edit-btn" class="btn btn-primary" onclick="editPassword(document.getElementById('password-modal').dataset.id)">
+                    <i class="fas fa-edit"></i> Редактировать
+                </button>
+
+                <!-- Кнопки для режима редактирования -->
+                <button id="modal-save-btn" class="btn btn-success hidden" onclick="savePassword()">
+                    <i class="fas fa-save"></i> Сохранить
+                </button>
+                <button id="modal-cancel-btn" class="btn btn-secondary hidden" onclick="cancelEdit()">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+
+                <button class="btn btn-danger" onclick="deletePassword()">
+                    <i class="fas fa-trash"></i> Удалить
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
